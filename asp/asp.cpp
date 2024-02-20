@@ -43,8 +43,8 @@ complex<double>Green(double p) {
 
 
 complex<double> K(double x1, double y1, double x2, double y2) {
-    double p =sqrt( pow(x2 - x1, 2) + pow(y2 - y1, 2));
-    return Green(p);
+    double p = pow(x2 - x1, 2) + pow(y2 - y1, 2);
+    return p;
 }
 
 
@@ -69,7 +69,7 @@ complex<double> K(double x1, double y1, double x2, double y2) {
 //    }
 //    return in;
 //}
-complex<double> middlepryam2(double a1, double b1, double a2, double b2, double xi[n][2]) {
+complex<double> middlepryam2(double a1, double b1, double a2, double b2, double xi1, double xi2) {
     double nn = 10, h22, h11, x2, x1, i = 0, c, t1, t2, y1,y2;
     complex<double> in(0, 0);
 
@@ -80,7 +80,7 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-            if ((abs(y1 - y2) > 0)&& abs((xi[i1][0]-xi[i2][1])>0)) in += K(y1,y2,xi[i1][0],xi[i2][1] )* h11 * h22;
+            in += K(y1,y2,xi1,xi2) * h11 * h22;
         }
     }
     return in;
@@ -182,25 +182,25 @@ int main(int argc, char** argv) {
        
         
     }
-    for (int i1 = 0; i1 < n; i1++) {
-        for (int j1 = 0; j1 < n; j1++) {
-            i = i1 * n + j1;
-            for (int i2=0; i2 < n; i2++) {
-                for (int j2=0; j2 < n; j2++) {
-                    j = j2 + i2 * n;
-                    A[i][j] = del(i, j) - lymda * middlepryam2(x1[i1], x1[j1],x2[i2],x2[j2], xi);
-                }
+    //for (int i1 = 0; i1 < n; i1++) {
+    //    for (int j1 = 0; j1 < n; j1++) {
+    //        i = i1 * n + j1;
+    //        for (int i2=0; i2 < n; i2++) {
+    //            for (int j2=0; j2 < n; j2++) {
+    //                j = j2 + i2 * n;
+    //                A[i][j] = del(i, j) - lymda * middlepryam2(x1[i1], x1[j1],x2[i2],x2[j2], xi[i1][0], xi[j2][1]);
+    //            }
 
-            }
-            
+    //        }
+    //        
 
-        
-        }
+    //    
+    //    }
 
-        
+    //    
 
 
-    }
+    //}
     for (i = 0; i < n * n; i++) {
         A[i][n*n] = 1;
     }
@@ -241,6 +241,7 @@ int main(int argc, char** argv) {
     //}
 
     //}
+    cout << 'ded' << endl;
   for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
         cc[i*n+j] = A[i * n + j][n*n];
