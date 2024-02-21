@@ -23,9 +23,9 @@ using namespace std;
 /*
  *
  */
-const int n = 4;
+const int n =4;
 const int n2 = n * n;
-const double lymda = 0.05;
+const double lymda = 1;
 const double a = 0;
 const double b = 1;
 const double c = 0;
@@ -35,16 +35,16 @@ const complex<double> icomp(0, 1);
 const double h1 = (b - a) / n;
 const double h2 = (d - c) / n;
 
-complex<double>Green(double p) {
-    return (-icomp * 0.25) * (_j0(p) + icomp * _y0(p));
+double Green(double p) {
+    return ( 0.25) * (_j0(p)* _y0(p));
     //return(1.0 / (4.0 * icomp) * exp(icomp * p));
 
 }
 
 
-complex<double> K(double x1, double y1, double x2, double y2) {
-    double p = pow(x2 - x1, 2) + pow(y2 - y1, 2);
-    return p;
+double K(double x1, double y1, double x2, double y2) {
+    double p = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+    return Green(p);
 }
 
 
@@ -80,7 +80,7 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-            in += K(y1,y2,xi1,xi2) * h11 * h22;
+            if ((abs(xi1-y1) > 0)&&(abs(xi2-y2)>0)) in += K(y1,y2,xi1,xi2) * h11 * h22;
         }
     }
     return in;
@@ -131,18 +131,19 @@ complex<double> u(double xi1, double xi2, complex<double> cc[n],double massx1[n]
 
 }
 
-void Gauss(int k, complex<double> Matrix[n2][n2 + 1]) {
+void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
+    cout << "ded" << endl;
     if (Matrix[k][k] != (1.0, 0.0)) {
         complex<double> T = Matrix[k][k];
         for (int j = k; j < n2 + 1; j++) {
             Matrix[k][j] = Matrix[k][j] / T;
         }
     }
-    for (int i = 0; i < n2; i++) {
+    for (int i = 0; i < n*n; i++) {
         if ((Matrix[i][k] != complex<double>(0.0, 0.0)) && (i != k)) {
             complex<double> T = Matrix[i][k];
             Matrix[i][k] = complex<double>(0.0, 0.0);
-            for (int j = k + 1; j < n2 + 1; j++) {
+            for (int j = k + 1; j <n*n+1; j++) {
                 Matrix[i][j] -= Matrix[k][j] * T;
             }
         }
@@ -175,34 +176,49 @@ int main(int argc, char** argv) {
     }
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-             xi[i*n+j][0] = x1[i] + (h1 / 2);
-             xi[i* n + j ][1] = x2[j] + (h2 / 2);
+             xi[i*n+j][0] = x1[j] + (h1 / 2);
+             xi[i* n + j ][1] = x2[i] + (h2 / 2);
              cout << xi[i * n + j][0]<<"   "<<xi[i * n + j][1] << endl;
         }
        
         
     }
-    //for (int i1 = 0; i1 < n; i1++) {
-    //    for (int j1 = 0; j1 < n; j1++) {
-    //        i = i1 * n + j1;
-    //        for (int i2=0; i2 < n; i2++) {
-    //            for (int j2=0; j2 < n; j2++) {
-    //                j = j2 + i2 * n;
-    //                A[i][j] = del(i, j) - lymda * middlepryam2(x1[i1], x1[j1],x2[i2],x2[j2], xi[i1][0], xi[j2][1]);
-    //            }
+  /*  for (int i1 = 0; i1 < n; i1++) {
+        for (int j1 = 0; j1 < n; j1++) {
+            i = i1 * n + j1;
+            for (int i2=0; i2 < n; i2++) {
+                for (int j2=0; j2 < n; j2++) {
+                    j = j2 + i2 * n;
+                    A[i][j] = del(i, j) - lymda * middlepryam2(x1[i1], x1[j],x2[i2],x2[j2], xi[i][0], xi[j][1]);
+                }
 
-    //        }
-    //        
+            }
+            
 
-    //    
-    //    }
+        
+        }*/
 
-    //    
+        for (i = 0; i < n * n; i++){ 
+        
+            int i1 = i / n;
+            int j1 = i % n;
+            for ( j = 0; j < n*n; j++){ 
+          
+                int i2 = j / n;
+                int j2 = j % n;
+
+                A[i][j] = del(i, j) - lymda * middlepryam2(x1[j2], x1[j2+1], x2[i2], x2[i2+1], xi[i][0], xi[j][1]);
+
+            }
+        
+        }
+
 
 
     //}
     for (i = 0; i < n * n; i++) {
-        A[i][n*n] = 1;
+        /*A[i][n*n] 1;=*/
+        A[i][n * n] = exp(icomp*1000.0*xi[i][0]); 
     }
     
     //for (i = 0; i < n*n; i++) {
@@ -229,28 +245,27 @@ int main(int argc, char** argv) {
     Gauss(0, A);
 
 
-    //for (i = 0; i < n * n; i++) {
-    //    for (j = 0; j < n * n + 1 ; j++) {
+    for (i = 0; i < n * n; i++) {
+        for (j = 0; j < n * n + 1 ; j++) {
 
-    //        cout << A[i][j] << " ";
+            /*cout << A[i][j] << " ";*/
 
-    //    }
-    //        cc[i * n + j] = A[i * n + j][n * n];
+        }
+       cc[i] = A[i][n * n];     
+    /*   cout << cc[i] << endl;*/
+      /*  cout << endl;*/
+    }
 
-    //    cout << endl;
-    //}
-
-    //}
+    
     cout << 'ded' << endl;
+
   for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-        cc[i*n+j] = A[i * n + j][n*n];
+       
         out1 << x1[i] << " " << x2[j] << " " << abs(u(xi[i*n+j][0],xi[i * n + j][1],cc,x1,x2)) << endl;
         }
-       
-
-
     }
+
    /*   cout << abs(u(t1[i], cc, t1, t2)) << " " << endl;
     res1[i] = u(t1[i], c, t1, t2);
    
