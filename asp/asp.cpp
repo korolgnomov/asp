@@ -23,7 +23,7 @@ using namespace std;
 /*
  *
  */
-const int n =4;
+const int n =12;
 const int n2 = n * n;
 const double lymda = 1;
 const double a = 0;
@@ -35,14 +35,14 @@ const complex<double> icomp(0, 1);
 const double h1 = (b - a) / n;
 const double h2 = (d - c) / n;
 
-double Green(double p) {
-    return ( 0.25) * (_j0(p)* _y0(p));
+complex<double>  Green(double p) {
+    return ( 0.25) *icomp* (_j0(p)*_y0(p));
     //return(1.0 / (4.0 * icomp) * exp(icomp * p));
 
 }
 
 
-double K(double x1, double y1, double x2, double y2) {
+complex<double>  K(double x1, double y1, double x2, double y2) {
     double p = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
     return Green(p);
 }
@@ -70,7 +70,7 @@ double K(double x1, double y1, double x2, double y2) {
 //    return in;
 //}
 complex<double> middlepryam2(double a1, double b1, double a2, double b2, double xi1, double xi2) {
-    double nn = 10, h22, h11, x2, x1, i = 0, c, t1, t2, y1,y2;
+    double nn = 100, h22, h11, x2, x1, i = 0, c, t1, t2, y1,y2;
     complex<double> in(0, 0);
 
     h22 = (b2 - a2) / nn;
@@ -80,10 +80,10 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-            if ((abs(xi1-y1) > 0)&&(abs(xi2-y2)>0)) in += K(y1,y2,xi1,xi2) * h11 * h22;
+            if ((abs(xi1-y1) > 0)&&(abs(xi2-y2)>0)) in += K(y1,y2,xi1,xi2) ;
         }
     }
-    return in;
+    return in* h11 * h22;
 }
 double del(int i, int j) {
 
@@ -120,7 +120,7 @@ complex<double> u(double xi1, double xi2, complex<double> cc[n],double massx1[n]
     complex<double>s = 0;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-             s = s + cc[i*n+j] * phi(xi1,xi2 ,i,j, massx1, massx2);
+             s = s + cc[i+j*n] * phi(xi1,xi2 ,i,j, massx1, massx2);
         }
        
 
@@ -132,7 +132,6 @@ complex<double> u(double xi1, double xi2, complex<double> cc[n],double massx1[n]
 }
 
 void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
-    cout << "ded" << endl;
     if (Matrix[k][k] != (1.0, 0.0)) {
         complex<double> T = Matrix[k][k];
         for (int j = k; j < n2 + 1; j++) {
@@ -199,9 +198,7 @@ int main(int argc, char** argv) {
         }*/
 
         for (i = 0; i < n * n; i++){ 
-        
-            int i1 = i / n;
-            int j1 = i % n;
+
             for ( j = 0; j < n*n; j++){ 
           
                 int i2 = j / n;
@@ -218,7 +215,7 @@ int main(int argc, char** argv) {
     //}
     for (i = 0; i < n * n; i++) {
         /*A[i][n*n] 1;=*/
-        A[i][n * n] = exp(icomp*1000.0*xi[i][0]); 
+        A[i][n * n] = exp(icomp*xi[i][1]*xi[i][0]);
     }
     
     //for (i = 0; i < n*n; i++) {
@@ -257,12 +254,11 @@ int main(int argc, char** argv) {
     }
 
     
-    cout << 'ded' << endl;
+  
 
   for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-       
-        out1 << x1[i] << " " << x2[j] << " " << abs(u(xi[i*n+j][0],xi[i * n + j][1],cc,x1,x2)) << endl;
+        out1 << x1[i] << " " << x2[j] << " " << abs(u(xi[i+j*n][0],xi[i  + j* n][1],cc,x1,x2)) << endl;
         }
     }
 
