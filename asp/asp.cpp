@@ -210,8 +210,8 @@ int main(int argc, char** argv) {
                 A[i][j] = del(i,j) - lymda * middlepryam2(x1[j2], x1[j2+1], x2[i2], x2[i2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
 
             }
-            A[i][n * n] = exp(icomp*1.0* (x1[i1] + h1 / 2)*(x2[i1]*h2/2));
-            //1
+            A[i][n * n] =1 ;
+            //1exp(icomp*1.0* (x1[i1] + h1 / 2)*(x2[i1]*h2/2))
         
         }
 
