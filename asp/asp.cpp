@@ -23,15 +23,22 @@ using namespace std;
 /*
  *
  */
-const int n =3;
+const int n =10;
 const int n2 = n * n;
-const double lymda =1;
+const double pi = acos(-1);
+//const double lymda =1;
 const double a = 0;
-const double b = 1;
+const double b = 10;
 const double c = 0;
-const double d = 1;
+const double d = 10;
 const complex<double> icomp(0, 1);
-
+double Tera = pow(10, 12);
+double Giga = pow(10, 9);
+double Mega = pow(10, 3);
+double Hz = 3.0 * Giga;
+double ewave = 299792456; // m/sec
+const complex<double> k0((2.0 * pi * Hz) / ewave, 1), k1 = 1.5 * k0;
+const double lymda = abs(2.0 * pi / k0.real());
 
 
 complex<double>  Green(double p) {
@@ -79,7 +86,7 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-             in += K(y1,y2,xi1,xi2) * h11 * h22;
+             in += K(y1,y2,xi1,xi2) * h11 * h22*(pow(k0,2)-pow(k1,2));
         }
     }
     return in;
@@ -167,10 +174,13 @@ complex<double> vych(double a1, double b1, double c1, double d1) {
     for (i = 0; i < n + 1; i++) {
 
         x1[i] = a1 + i * h1;
+        cout << x1[i] << endl;
     }
     for (i = 0; i < n + 1; i++) {
 
         x2[i] = c1 + i * h2;
+        cout << x2[i] << endl;
+
     }
     //for (i = 0; i < n; i++) {
     //    for (j = 0; j < n; j++) {
@@ -208,8 +218,8 @@ complex<double> vych(double a1, double b1, double c1, double d1) {
                 A[i][j] = del(i,j) - lymda * middlepryam2(x1[j2], x1[j2+1], x2[i2], x2[i2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
 
             }
-            A[i][n * n] = exp(icomp*1.0* (x1[i1] + h1 / 2)*(x2[i1]*h2/2));
-            //1
+            A[i][n * n] = exp((x1[i1]+h1/2)*icomp* ewave);
+            //1)
         
         }
 
@@ -217,6 +227,7 @@ complex<double> vych(double a1, double b1, double c1, double d1) {
 
     //}
     
+
         /*A[i][n*n] exp(icomp*1000.0*xi[i][0]*xi[i][1]);1;=*/
         
    
@@ -284,12 +295,12 @@ complex<double> vych(double a1, double b1, double c1, double d1) {
 
 int main(int argc, char** argv) {
     ofstream  out1("1ecr.txt");
-    double a = 0, b = 1, c = 0, d = 1;
     const double h1 = (b - a) / n;
     const double h2 = (d - c) / n;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            vych(a + i * h1, a + (i + 1) * h1, c + j * h2, d + (j + 1) * h2);
+            cout << a + i * h1 << " " << a + (i + 1) * h1 << " " << c + j * h2 << " " << c + (j + 1) * h2 << endl;
+            vych(a + j * h1, a + (j + 1) * h1, c + i * h2, c + (i + 1) * h2);
         }
     }
 
