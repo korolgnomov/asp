@@ -23,7 +23,7 @@ using namespace std;
 /*
  *
  */
-const int n =20;
+const int n =3;
 const int n2 = n * n;
 const double lymda =1;
 const double a = 0;
@@ -32,8 +32,7 @@ const double c = 0;
 const double d = 1;
 const complex<double> icomp(0, 1);
 
-const double h1 = (b - a) / n;
-const double h2 = (d - c) / n;
+
 
 complex<double>  Green(double p) {
     return ( 0.25) *icomp* (_j0(p)* _y0(p));
@@ -154,25 +153,24 @@ void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
 }
 
 
-int main(int argc, char** argv) {
+complex<double> vych(double a1, double b1, double c1, double d1) {
     double h ,x1[n + 1], x2[n + 1];//xi[n * n][2]
     complex<double> A[n * n][n * n + 1], cc[n * n];
     int i, j, k;
-    ofstream  out1("1ecr.txt");
-
+    ofstream  out1("1ecr.txt", ios::app);
+    const double h1 = (b1 - a1) / n;
+    const double h2 = (d1 - c1) / n;
    // h = (b - a) / n;
 
 
 
     for (i = 0; i < n + 1; i++) {
 
-        x1[i] = a + i * h1;
-        cout << x1[i] << endl;
+        x1[i] = a1 + i * h1;
     }
     for (i = 0; i < n + 1; i++) {
 
-        x2[i] = c + i * h2;
-        cout << x2[i] << endl;
+        x2[i] = c1 + i * h2;
     }
     //for (i = 0; i < n; i++) {
     //    for (j = 0; j < n; j++) {
@@ -283,3 +281,16 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+
+int main(int argc, char** argv) {
+    ofstream  out1("1ecr.txt");
+    double a = 0, b = 1, c = 0, d = 1;
+    const double h1 = (b - a) / n;
+    const double h2 = (d - c) / n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            vych(a + i * h1, a + (i + 1) * h1, c + j * h2, d + (j + 1) * h2);
+        }
+    }
+
+}
