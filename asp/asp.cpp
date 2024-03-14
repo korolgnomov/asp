@@ -23,7 +23,7 @@ using namespace std;
 /*
  *
  */
-const int n =20;
+const int n = 20;
 const int n2 = n * n;
 const double pi = acos(-1);
 const complex<double> icomp(0, 1);
@@ -54,9 +54,17 @@ complex<double>  Green(double p) {
 }
 
 
-complex<double>  K(double x1, double y1, double x2, double y2) {
-    double p = sqrt(pow(x1 -x2 , 2) + pow(y1 -y2 , 2));
-    return Green(p)* (pow(k1, 2) - pow(k0, 2));
+complex<double>  Ker(double x1, double y1, double x2, double y2) {
+    complex<double> zero(0, 0);
+    double p = sqrt(pow(x1 - x2 , 2) + pow(y1 - y2 , 2));
+    if (p > 1e-10) {
+        return Green(p);
+    }
+    else return(zero);
+}
+complex<double>  K(double x1, double y1) {
+    //double p = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+    return k1 * k1*(1.0+0*abs(x1-y1)) - k0 * k0;
 }
 
 
@@ -92,7 +100,7 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-             in += K(y1,y2,xi1,xi2) * h11 * h22;
+             in += Ker(y1,y2,xi1,xi2) * h11 * h22*K(y1,y2);
         }
     }
     return in;
@@ -167,7 +175,7 @@ void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
 
 
 int main(int argc, char** argv) {
-    double h ,x1[n + 1], x2[n + 1];//xi[n * n][2]
+    double h ,x1[n + 1], x2[n + 1];//xi[n * n][2] 
     complex<double> A[n * n][n * n + 1], cc[n * n];
     int i, j, k;
     ofstream  out1("1ecr.txt");
@@ -222,8 +230,8 @@ int main(int argc, char** argv) {
                 A[i][j] = del(i,j) - lymda * middlepryam2(x1[i2], x1[i2+1], x2[j2], x2[j2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
 
             }
-            A[i][n * n] =exp(icomp* k0*(x1[i1] + h1 / 2));
-            //1 
+            A[i][n * n] = 1;
+            //1 exp(icomp* k0*(x1[i1] + h1 / 2))
         
         }
 
@@ -278,17 +286,12 @@ int main(int argc, char** argv) {
       int j1 = j % n;
         for (j = 0; j < n; j++) {
        
-        out1 << x1[i] << " " << x2[j] << " " << abs(u(x1[i]+h1/2,x2[j]+h2/2,cc,x1,x2)) << endl;
+        out1 << x1[i] << " " << x2[j] << " " << abs(u(x1[i]+h1/2, x2[j]+h2/2, cc, x1, x2)) << endl;
         }
     }
 
    /*   cout << abs(u(t1[i], cc, t1, t2)) << " " << endl;
     res1[i] = u(t1[i], c, t1, t2);
-   
-/*
- 
-
-
 
 */
 
