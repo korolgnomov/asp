@@ -49,13 +49,14 @@ const double h2 = (d - c) / n;
 complex<double>  Green(double p) {
     return ( 0.25) *icomp* (_j0(p)* _y0(p));
     //return(1.0 / (4.0 * icomp) * exp(icomp * p));
+    //return(exp(icomp * k0 * p) / (4 * pi * p));
 
 }
 
 
 complex<double>  K(double x1, double y1, double x2, double y2) {
     double p = sqrt(pow(x1 -x2 , 2) + pow(y1 -y2 , 2));
-    return Green(p);
+    return Green(p)* (pow(k1, 2) - pow(k0, 2));
 }
 
 
@@ -91,7 +92,7 @@ complex<double> middlepryam2(double a1, double b1, double a2, double b2, double 
         y1 = a1 + (i1 + 0.5) * h11;
         for (int i2 = 0; i2 < nn; i2++) {
             y2 = a2 + (i2 + 0.5) * h22;
-             in += K(y1,y2,xi1,xi2) * h11 * h22* (pow(k0, 2) - pow(k1, 2));;
+             in += K(y1,y2,xi1,xi2) * h11 * h22;
         }
     }
     return in;
@@ -218,11 +219,11 @@ int main(int argc, char** argv) {
                 int i2 = j / n;
                 int j2 = j % n;
 
-                A[i][j] = del(i,j) - lymda * middlepryam2(x1[j2], x1[j2+1], x2[i2], x2[i2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
+                A[i][j] = del(i,j) - lymda * middlepryam2(x1[i2], x1[i2+1], x2[j2], x2[j2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
 
             }
-            A[i][n * n] =exp(icomp*1.0* k0*(x1[i1] + h1 / 2)) ;
-            //1
+            A[i][n * n] =exp(icomp* k0*(x1[i1] + h1 / 2));
+            //1 
         
         }
 
