@@ -25,13 +25,20 @@ using namespace std;
  */
 const int n =20;
 const int n2 = n * n;
-const double lymda =1;
+//const double lymda =1;
 const double a = 0;
 const double b = 1;
 const double c = 0;
 const double d = 1;
 const complex<double> icomp(0, 1);
-
+const double pi = acos(-1);
+double Tera = pow(10, 12);
+double Giga = pow(10, 9);
+double Mega = pow(10, 3);
+double Hz = 3.0 * Giga;
+double ewave = 299792456; // m/sec
+const complex<double> k0((2.0 * pi * Hz) / ewave, 1), k1 = 1.5 * k0;
+const double lymda = abs(2.0 * pi / k0.real());
 const double h1 = (b - a) / n;
 const double h2 = (d - c) / n;
 
