@@ -174,40 +174,32 @@ void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
 }
 
 void GaussInv(complex<double> A[n * n][n * n + 1], complex<double>  bigA[n*n][2*n*n]) {
-    complex<double>ed[n][n], bigA[n][2 * n], K, res[n][n];
+    complex<double>  K;
     int i, j, k;
-    for (i = 0; i < n; i++) {
-        ed[i][i] = 1;
-    }
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            bigA[i][j] = A[i][j];
-            bigA[i][j + n] = ed[i][j];
-        }
-    }
-    for (k = 0; k < n; k++) {
-        for (i = 0; i < 2 * n; i++) {
+ 
+    for (k = 0; k < n2; k++) {
+        for (i = 0; i < 2 * n2; i++) {
             bigA[k][i] = bigA[k][i] / A[k][k];
         }
-        for (i = k + 1; i < n; i++) {
+        for (i = k + 1; i < n2; i++) {
             K = bigA[i][k] / bigA[k][k];
-            for (j = 0; j < 2 * n; j++) {
+            for (j = 0; j < 2 * n2; j++) {
                 bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
             }
         }
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
+        for (i = 0; i < n2; i++) {
+            for (j = 0; j < n2; j++) {
                 A[i][j] = bigA[i][j];
             }
         }
     }
-    for (k = n - 1; k > -1; k--) {
-        for (i = 2 * n - 1; i > -1; i--) {
+    for (k = n2 - 1; k > -1; k--) {
+        for (i = 2 * n2 - 1; i > -1; i--) {
             bigA[k][i] = bigA[k][i] / A[k][k];
         }
         for (i = k - 1; i > -1; i--) {
             K = bigA[i][k] / bigA[k][k];
-            for (j = 2 * n - 1; j > -1; j++) {
+            for (j = 2 * n2 - 1; j > -1; j++) {
                 bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
             }
         }
@@ -222,7 +214,7 @@ void GaussInv(complex<double> A[n * n][n * n + 1], complex<double>  bigA[n*n][2*
 
 int main(int argc, char** argv) {
     double h ,x1[n + 1], x2[n + 1];//xi[n * n][2] 
-    complex<double> A[n * n][n * n + 1], cc[n * n];
+    complex<double> A[n * n][n * n + 1], cc[n * n], ed[n*n][n*n], bigA[n*n][2*n*n];
     int i, j, k;
     ofstream  out1("1ecr.txt");
 
@@ -281,7 +273,15 @@ int main(int argc, char** argv) {
         
         }
 
-
+        for (i = 0; i < n2; i++) {
+            ed[i][i] = 1;
+        }
+        for (i = 0; i < n2; i++) {
+            for (j = 0; j < n2; j++) {
+                bigA[i][j] = A[i][j];
+                bigA[i][j + n2] = ed[i][j];
+            }
+        }
 
     //}
     
