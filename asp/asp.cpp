@@ -173,7 +173,25 @@ void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
     }
 }
 
+double GaussInv(complex<double> A[n * n][n * n + 1]) {
+    complex<double>ed[n][n], bigA[n][2 * n];
+    int i, j, k;
+    for (i = 0; i < n; i++) {
+        ed[i][i] = 1;
+    }
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            bigA[i][j] = A[i][j];
+            bigA[i][j + n] = ed[i][j];
+        }
 
+
+
+    }
+
+
+
+}
 int main(int argc, char** argv) {
     double h ,x1[n + 1], x2[n + 1];//xi[n * n][2] 
     complex<double> A[n * n][n * n + 1], cc[n * n];
