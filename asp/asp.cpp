@@ -23,7 +23,7 @@ using namespace std;
 /*
  *
  */
-const int n = 20;
+const int n = 30;
 const int n2 = n * n;
 const double pi = acos(-1);
 const complex<double> icomp(0, 1);
@@ -48,6 +48,7 @@ const double h2 = (d - c) / n;
 
 complex<double>  Green(double p) {
     return ( 0.25) *icomp* (_j0(p)* _y0(p));
+    /*return(p);*/
     //return(1.0 / (4.0 * icomp) * exp(icomp * p));
     //return(exp(icomp * k0 * p) / (4 * pi * p));
 
@@ -64,7 +65,7 @@ complex<double>  Ker(double x1, double y1, double x2, double y2) {
 }
 complex<double>  K(double x1, double y1) {
     //double p = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
-    return k1 * k1*(1.0+0*abs(x1-y1)) - k0 * k0;
+    return k1 * k1*(1.0+50.0*abs(x1-y1)) - k0 * k0;
 }
 
 
@@ -150,36 +151,64 @@ complex<double> u(double xi1, double xi2, complex<double> cc[n],double massx1[n]
 
 
 }
-
-void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
-    
-    if (Matrix[k][k] != (1.0, 0.0)) {
-        complex<double> T = Matrix[k][k];
-        for (int j = k; j < n2 + 1; j++) {
-            Matrix[k][j] = Matrix[k][j] / T;
+//
+//void Gauss(int k, complex<double> Matrix[n*n][n*n+ 1]) {
+//    
+//    if (Matrix[k][k] != (1.0, 0.0)) {
+//        complex<double> T = Matrix[k][k];
+//        for (int j = k; j < n2 + 1; j++) {
+//            Matrix[k][j] = Matrix[k][j] / T;
+//        }
+//    }
+//    for (int i = 0; i < n*n; i++) {
+//        if ((Matrix[i][k] != complex<double>(0.0, 0.0)) && (i != k)) {
+//            complex<double> T = Matrix[i][k];
+//            Matrix[i][k] = complex<double>(0.0, 0.0);
+//            for (int j = k + 1; j <n*n+1; j++) {
+//                Matrix[i][j] -= Matrix[k][j] * T;
+//            }
+//        }
+//    }
+//    if (k < n2 - 1) {
+//        Gauss(k + 1, Matrix);
+//    }
+//}
+void Gauss(complex<double>  bigA[n * n][n * n + 1]) {
+    complex<double>  K, elem;
+    int i, j, k;
+    for (k = 0; k < n2; k++) {
+        elem = bigA[k][k];
+        for (i = 0; i < n2 + 1; i++) {
+            bigA[k][i] = bigA[k][i] / elem;
         }
-    }
-    for (int i = 0; i < n*n; i++) {
-        if ((Matrix[i][k] != complex<double>(0.0, 0.0)) && (i != k)) {
-            complex<double> T = Matrix[i][k];
-            Matrix[i][k] = complex<double>(0.0, 0.0);
-            for (int j = k + 1; j <n*n+1; j++) {
-                Matrix[i][j] -= Matrix[k][j] * T;
+        for (i = k + 1; i < n2; i++) {
+            K = bigA[i][k] / bigA[k][k];
+            for (j = 0; j < n2 + 1; j++) {
+                bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
             }
         }
     }
-    if (k < n2 - 1) {
-        Gauss(k + 1, Matrix);
+    for (k = n2 - 1; k > -1; k--) {
+        elem = bigA[k][k];
+        for (i = n2; i > -1; i--) {
+            bigA[k][i] = bigA[k][i] / elem;
+        }
+        for (i = k - 1; i > -1; i--) {
+            K = bigA[i][k] / bigA[k][k];
+            for (j =  n2; j > -1; j--) {
+                bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
+            }
+        }
     }
 }
 
-void GaussInv(complex<double> A[n * n][n * n + 1], complex<double>  bigA[n*n][2*n*n]) {
-    complex<double>  K;
+void GaussInv(complex<double>  bigA[n*n][2*n*n]) {
+    complex<double>  K, elem;
     int i, j, k;
- 
     for (k = 0; k < n2; k++) {
+        elem = bigA[k][k];
         for (i = 0; i < 2 * n2; i++) {
-            bigA[k][i] = bigA[k][i] / A[k][k];
+            bigA[k][i] = bigA[k][i] / elem;
         }
         for (i = k + 1; i < n2; i++) {
             K = bigA[i][k] / bigA[k][k];
@@ -187,30 +216,21 @@ void GaussInv(complex<double> A[n * n][n * n + 1], complex<double>  bigA[n*n][2*
                 bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
             }
         }
-        for (i = 0; i < n2; i++) {
-            for (j = 0; j < n2; j++) {
-                A[i][j] = bigA[i][j];
-            }
-        }
     }
     for (k = n2 - 1; k > -1; k--) {
+        elem = bigA[k][k];
         for (i = 2 * n2 - 1; i > -1; i--) {
-            bigA[k][i] = bigA[k][i] / A[k][k];
+            bigA[k][i] = bigA[k][i] / elem;
         }
         for (i = k - 1; i > -1; i--) {
             K = bigA[i][k] / bigA[k][k];
-            for (j = 2 * n2 - 1; j > -1; j++) {
+            for (j = 2 * n2 - 1; j > -1; j--) {
                 bigA[i][j] = bigA[i][j] - bigA[k][j] * K;
             }
         }
     }
-
-    //for(i=0;i<n;i++){
-    //    for (j = 0; j < n; j++) {
-    //        res[i][j] = bigA[i][j + n];
-    //    }
-    //}
 }
+
 
 int main(int argc, char** argv) {
     double h ,x1[n + 1], x2[n + 1];//xi[n * n][2] 
@@ -225,12 +245,12 @@ int main(int argc, char** argv) {
     for (i = 0; i < n + 1; i++) {
 
         x1[i] = a + i * h1;
-        cout << x1[i] << endl;
+     /*   cout << x1[i] << endl;*/
     }
     for (i = 0; i < n + 1; i++) {
 
         x2[i] = c + i * h2;
-        cout << x2[i] << endl;
+        //cout << x2[i] << endl;
     }
     //for (i = 0; i < n; i++) {
     //    for (j = 0; j < n; j++) {
@@ -268,20 +288,38 @@ int main(int argc, char** argv) {
                 A[i][j] = del(i,j) - lymda * middlepryam2(x1[i2], x1[i2+1], x2[j2], x2[j2+1], x1[i1]+h1/2, x2[j1] + h2 / 2);
 
             }
-            A[i][n * n] = 1;
-            //1 exp(icomp* k0*(x1[i1] + h1 / 2))
+            A[i][n * n] = exp(icomp* k0*(x1[i1] + h1 / 2));
+            //1 
         
         }
 
-        for (i = 0; i < n2; i++) {
-            ed[i][i] = 1;
-        }
-        for (i = 0; i < n2; i++) {
-            for (j = 0; j < n2; j++) {
-                bigA[i][j] = A[i][j];
-                bigA[i][j + n2] = ed[i][j];
-            }
-        }
+        //for (i = 0; i < n2; i++) {
+        //    ed[i][i] = 1;
+        //}
+        //for (i = 0; i < n2; i++) {
+        //    for (j = 0; j < n2; j++) {
+        //        bigA[i][j] = A[i][j];
+        //        bigA[i][j + n2] = ed[i][j];
+        //    }
+        //}
+        //for (i = 0; i < n2; i++) {
+        //    for (j = 0; j < n2 + 1; j++) {
+
+        //        cout << A[i][j] << " ";
+
+
+        //    }
+        //    cout << endl;
+        //}
+        //GaussInv(bigA);
+        //cout<<'ded' << endl << endl;
+
+        //for(i=0;i<n2;i++){
+        //     for (j = 0; j < n2; j++) {
+        //        cout << bigA[i][j + n2] << " ";
+        //     }
+        //  cout<<endl;
+        //}
 
     //}
     
@@ -310,7 +348,7 @@ int main(int argc, char** argv) {
 
     //}
 
-    Gauss(0, A);
+    Gauss(A);
 
 
     for (i = 0; i < n * n; i++) {
