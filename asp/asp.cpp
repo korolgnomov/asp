@@ -33,7 +33,7 @@ double Mega = pow(10, 3);
 double Hz = 3.0 * Giga;
 double ewave = 299792456; // m/sec;
 const complex<double> k0((2.0 * pi * Hz) / ewave, 0), k1 = 1.5 * k0;
-
+const complex<double> alpha = 2.0;
 const double lymda = abs(2.0 * pi / k0.real());
 //const double lymda =1;
 const double a = -lymda/2;
@@ -229,6 +229,19 @@ void GaussInv(complex<double>  bigA[n*n][2*n*n]) {
             }
         }
     }
+}
+
+void FastInv(int i, complex<double> Ainv[n*n][n*n]) {
+    int j, k;
+    complex<double> mn = pow(1.0 + Ainv[i][i] * alpha, -1), pr[n*n][n*n];
+    for (j = 0; j < n2; j++) {
+        for (k = 0; k < n; k++) {
+            pr[j][k] = mn * Ainv[j][i] * alpha * Ainv[j][k];
+        }
+    }
+
+
+
 }
 
 
