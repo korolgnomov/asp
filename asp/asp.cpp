@@ -23,7 +23,7 @@ using namespace std;
 /*
  *
  */
-const int n = 30;
+const int n = 2;
 const int n2 = n * n;
 const double pi = acos(-1);
 const complex<double> icomp(0, 1);
@@ -47,7 +47,8 @@ const double h1 = (b - a) / n;
 const double h2 = (d - c) / n;
 
 complex<double>  Green(double p) {
-    return ( 0.25) *icomp* (_j0(p)* _y0(p));
+    //return ( 0.25) *icomp* (_j0(p)* _y0(p));
+    return(1);
     /*return(p);*/
     //return(1.0 / (4.0 * icomp) * exp(icomp * p));
     //return(exp(icomp * k0 * p) / (4 * pi * p));
@@ -235,19 +236,23 @@ void FastInv(int i, complex<double> Ainv[n*n][n*n]) {
     int j, k;
     complex<double> mn = pow(1.0 + Ainv[i][i] * alpha, -1), pr[n*n][n*n];
     for (j = 0; j < n2; j++) {
-        for (k = 0; k < n; k++) {
-            pr[j][k] = mn * Ainv[j][i] * alpha * Ainv[j][k];
+        for (k = 0; k < n2; k++) {
+            pr[j][k] = Ainv[j][k] - mn * Ainv[j][i] * alpha * Ainv[i][k];
         }
     }
+    for (i = 0; i < n2; i++) {
+        for (j = 0; j < n2; j++) {
 
-
-
+            cout << pr[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
 
 
 int main(int argc, char** argv) {
     double h ,x1[n + 1], x2[n + 1];//xi[n * n][2] 
-    complex<double> A[n * n][n * n + 1], cc[n * n], ed[n*n][n*n], bigA[n*n][2*n*n];
+    complex<double> A[n * n][n * n + 1], cc[n * n], ed[n*n][n*n], bigA[n*n][2*n*n], Ainv[n*n][n*n];
     int i, j, k;
     ofstream  out1("1ecr.txt");
 
@@ -306,33 +311,38 @@ int main(int argc, char** argv) {
         
         }
 
-        //for (i = 0; i < n2; i++) {
-        //    ed[i][i] = 1;
-        //}
-        //for (i = 0; i < n2; i++) {
-        //    for (j = 0; j < n2; j++) {
-        //        bigA[i][j] = A[i][j];
-        //        bigA[i][j + n2] = ed[i][j];
-        //    }
-        //}
-        //for (i = 0; i < n2; i++) {
-        //    for (j = 0; j < n2 + 1; j++) {
+        for (i = 0; i < n2; i++) {
+            ed[i][i] = 1;
+        }
+        for (i = 0; i < n2; i++) {
+            for (j = 0; j < n2; j++) {
+                bigA[i][j] = A[i][j];
+                bigA[i][j + n2] = ed[i][j];
+            }
+        }
+        for (i = 0; i < n2; i++) {
+            for (j = 0; j < n2 + 1; j++) {
 
-        //        cout << A[i][j] << " ";
+                cout << A[i][j] << " ";
 
 
-        //    }
-        //    cout << endl;
-        //}
-        //GaussInv(bigA);
-        //cout<<'ded' << endl << endl;
+            }
+            cout << endl;
+        }
+        GaussInv(bigA);
+        cout<<'ded' << endl << endl;
 
-        //for(i=0;i<n2;i++){
-        //     for (j = 0; j < n2; j++) {
-        //        cout << bigA[i][j + n2] << " ";
-        //     }
-        //  cout<<endl;
-        //}
+        for(i=0;i<n2;i++){
+             for (j = 0; j < n2; j++) {
+                 Ainv[i][j] = bigA[i][j + n2];
+                cout << bigA[i][j + n2] << " ";
+             }
+          cout<<endl;
+        }
+        cout<<"-------------------" << endl;
+        FastInv(1, Ainv);
+
+
 
     //}
     
